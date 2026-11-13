@@ -26,6 +26,31 @@ export class Tank {
     this.muzzle = new THREE.Object3D();
     this.muzzle.position.set(0, 0.35, -4.6);
     this.turret.add(this.muzzle);
+
+    // Полоска здоровья над врагами (спрайт всегда лицом к камере)
+    if (!this.isPlayer && typeof document !== 'undefined') {
+      this.hpCanvas = document.createElement('canvas');
+      this.hpCanvas.width = 64; this.hpCanvas.height = 8;
+      this.hpTexture = new THREE.CanvasTexture(this.hpCanvas);
+      const mat = new THREE.SpriteMaterial({ map: this.hpTexture, depthTest: false, transparent: true });
+      this.hpSprite = new THREE.Sprite(mat);
+      this.hpSprite.scale.set(4.2, 0.52, 1);
+      this.hpSprite.position.set(0, 4.2, 0);
+      this.hpSprite.renderOrder = 10;
+      this.group.add(this.hpSprite);
+      this.drawHealthBar();
+    }
+  }
+
+  drawHealthBar() {
+    if (!this.hpCanvas) return;
+    const c = this.hpCanvas.getContext('2d');
+    const pct = Math.max(0, this.hp / this.maxHp);
+    c.clearRect(0, 0, 64, 8);
+    c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(0, 0, 64, 8);
+    c.fillStyle = pct > 0.55 ? '#37d67a' : pct > 0.25 ? '#ffb347' : '#ff4757';
+    c.fillRect(1, 1, 62 * pct, 6);
+    this.hpTexture.needsUpdate = true;
   }
 
   build() {
@@ -135,8 +160,13 @@ export class Tank {
   takeDamage(amount) {
     if (!this.alive) return false;
     this.hp -= amount;
+    this.drawHealthBar();
     if (this.hp <= 0) { this.hp = 0; this.alive = false; return true; }
     return false;
   }
-  dispose() { this.scene.remove(this.group); }
+  dispose() {
+    this.scene.remove(this.group);
+    if (this.hpTexture) this.hpTexture.dispose();
+    if (this.hpSprite) this.hpSprite.material.dispose();
+  }
 }
