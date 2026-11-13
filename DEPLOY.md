@@ -59,7 +59,7 @@ firebase deploy --only hosting,firestore:rules
 1. Firebase Console → **Firestore Database** → Create (production mode).
 2. Project settings → **Your apps → Web app** → скопируй `firebaseConfig`.
 3. Скопируй `firebase-config.example.js` → `js/firebase-config.js` и вставь конфиг.
-4. В `index.html` перед `<script type="module" src="js/main.js">` добавь:
+4. В `index.html` перед `<script type="module" src="js/app.js">` добавь:
    ```html
    <script src="js/firebase-config.js"></script>
    ```
