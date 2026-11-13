@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Tanks — редактор моделей</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>">
+<link rel="stylesheet" href="css/models.css">
+</head>
+<body>
+
+<header id="bar">
+  <div class="brand">🧩 РЕДАКТОР МОДЕЛЕЙ <span>City Tanks</span></div>
+  <div class="bar-actions">
+    <select id="load-game" title="Загрузить танк из игры">
+      <option value="">Загрузить танк из игры…</option>
+    </select>
+    <button id="btn-new">Новый</button>
+    <button id="btn-import">Импорт JSON</button>
+    <input type="file" id="file-input" accept=".json,application/json" hidden>
+    <button id="btn-export" class="gold">Экспорт JSON</button>
+    <button id="btn-copy">Копировать</button>
+    <a class="back" href="index.html">← В ангар</a>
+  </div>
+</header>
+
+<main id="layout">
+  <!-- Части -->
+  <aside id="parts-panel">
+    <div class="panel-head">Части модели</div>
+    <div class="add-row">
+      <button data-add="box">+ Бокс</button>
+      <button data-add="wedge">+ Клин</button>
+      <button data-add="cylinder">+ Цилиндр</button>
+      <button data-add="sphere">+ Сфера</button>
+      <button data-add="cone">+ Конус</button>
+    </div>
+    <div id="parts-list"></div>
+    <div class="panel-foot">
+      <div>Частей: <b id="parts-count">0</b> · Полигонов: <b id="tri-count">0</b></div>
+      <div class="muted small">Клик — выбрать. ПКМ по части — удалить.</div>
+    </div>
+  </aside>
+
+  <!-- Вьюпорт -->
+  <section id="viewport">
+    <canvas id="editor-canvas"></canvas>
+    <div id="viewport-overlay">
+      <div class="badge" id="model-name">—</div>
+      <div class="badge dim">ЛКМ — вращать · колесо — зум</div>
+    </div>
+    <div id="test-controls">
+      <label>Башня <input type="range" id="test-turret" min="-180" max="180" value="0"></label>
+      <label>Орудие <input type="range" id="test-gun" min="-10" max="25" value="0"></label>
+      <label class="chk"><input type="checkbox" id="test-spin"> Крутить катки</label>
+    </div>
+  </section>
+
+  <!-- Свойства -->
+  <aside id="props-panel">
+    <div class="panel-head">Свойства</div>
+    <div id="props-body">
+      <p class="muted">Выберите часть слева, чтобы редактировать её.</p>
+    </div>
+    <div class="section">
+      <h4>JSON профиля</h4>
+      <textarea id="json-view" readonly></textarea>
+      <div class="btn-row">
+        <button id="btn-save-local">Сохранить в браузере</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- Скрытые шаблоны -->
+<template id="tpl-number">
+  <div class="field"><label></label><input type="number" step="0.01"></div>
+</template>
+
+<div id="toast"></div>
+<script type="module" src="js/models.js"></script>
+</body>
+</html>

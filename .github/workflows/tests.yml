@@ -14,7 +14,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Логика игры
-        run: node tests/game.test.mjs
+      - name: Броня и пробитие
+        run: node tests/armor.test.mjs
+      - name: Данные танков и прогрессия
+        run: node tests/data.test.mjs
+      - name: Боевая логика
+        run: node tests/battle.test.mjs
+      - name: Полная симуляция боя
+        run: node tests/sim.test.mjs
       - name: Целостность сайта
         run: node tests/structure.test.mjs

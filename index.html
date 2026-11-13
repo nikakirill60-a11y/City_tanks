@@ -3,93 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>City Tanks — 3D танки в городе</title>
-<meta name="description" content="City Tanks — 3D танковая аркада в браузере. HTML + JS + CSS + Three.js. Деплой: GitHub Pages, Vercel, Firebase Hosting.">
+<title>City Tanks — танковый ангар и бои</title>
+<meta name="description" content="City Tanks — танковая аркада в духе World of Tanks: ангар, дерево прокачки, бои с бронёй и пробитием. HTML + JS + CSS + Three.js.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<canvas id="game-canvas"></canvas>
 
-<!-- HUD -->
-<div id="hud" class="hidden">
-  <div id="hud-top">
-    <div class="hud-box" id="hud-health-wrap">
-      <div class="hud-label">❤️ Броня</div>
-      <div class="bar"><div id="hud-health" class="bar-fill"></div></div>
-      <div class="hud-box" style="margin-top:6px">
-        <div class="hud-label">🔥 Перезарядка</div>
-        <div class="bar"><div id="hud-reload" class="bar-fill reload"></div></div>
+<!-- ================= АНГАР ================= -->
+<div id="screen-garage" class="screen">
+  <header id="topbar">
+    <div class="topbar-left">
+      <span class="logo">CITY TANKS</span>
+      <span class="player-name" id="player-name">Командир</span>
+    </div>
+    <div class="topbar-right">
+      <div class="currency" title="Серебро"><span class="cur-icon silver">◆</span><span id="currency-credits">0</span></div>
+      <div class="currency" title="Свободный опыт"><span class="cur-icon xp">✦</span><span id="currency-xp">0</span></div>
+      <button class="icon-btn" id="btn-import-model" title="Импорт модели из редактора (JSON)">📥</button>
+      <button class="icon-btn" id="btn-models" title="Редактор моделей">🧩</button>
+      <input type="file" id="model-input" accept=".json,application/json" hidden>
+      <button class="icon-btn" id="btn-settings" title="Настройки">⚙</button>
+    </div>
+  </header>
+
+  <main id="garage-main">
+    <!-- Дерево исследований -->
+    <aside id="tech-panel">
+      <div class="panel-title">Дерево исследований</div>
+      <div class="nation-tabs" id="nation-tabs"></div>
+      <div class="tech-list" id="tech-list"></div>
+    </aside>
+
+    <!-- 3D вьюпорт -->
+    <section id="garage-viewport">
+      <canvas id="garage-canvas"></canvas>
+      <div id="tank-plate">
+        <div class="tank-tier" id="tank-tier">I</div>
+        <div>
+          <div class="tank-title" id="tank-title">Т-26</div>
+          <div class="tank-subtitle" id="tank-subtitle">Лёгкий танк · СССР</div>
+        </div>
       </div>
+      <div class="viewport-hint">ЛКМ — вращать · колесо — зум</div>
+    </section>
+
+    <!-- Характеристики -->
+    <aside id="stats-panel">
+      <div class="panel-title">Характеристики</div>
+      <div id="stats-body"></div>
+    </aside>
+  </main>
+
+  <footer id="garage-bottom">
+    <div class="carousel" id="carousel"></div>
+    <button id="btn-battle" class="battle-btn">В БОЙ</button>
+  </footer>
+</div>
+
+<!-- ================= БОЙ ================= -->
+<div id="screen-battle" class="screen hidden">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="battle-hud">
+    <div id="hud-top">
+      <div class="team" id="hud-team-a"></div>
+      <div class="battle-timer">
+        <div id="hud-timer">7:00</div>
+        <div id="hud-cap" class="cap hidden">Захват: <span id="cap-percent">0%</span></div>
+      </div>
+      <div class="team team-enemy" id="hud-team-b"></div>
     </div>
-    <div class="hud-box hud-center">
-      <div id="hud-score">СЧЁТ 0</div>
-      <div id="hud-wave">ВОЛНА 1</div>
-      <div id="hud-enemies">Врагов: 0</div>
+
+    <div id="crosshair">
+      <div class="ch ch-v"></div><div class="ch ch-h"></div>
+      <div id="dispersion"></div>
+      <div id="hit-marker" class="hidden"></div>
     </div>
-    <div class="hud-box hud-right">
-      <div id="hud-kills">💀 Убийств: 0</div>
-      <div id="hud-time">⏱ 0:00</div>
-      <button id="btn-pause" class="mini-btn">⏸ Пауза</button>
-      <button id="btn-sound" class="mini-btn">🔊</button>
+    <div id="damage-indicator" class="hidden"></div>
+    <div id="hit-text" class="hidden"></div>
+    <div id="kill-feed"></div>
+
+    <div id="battle-bottom">
+      <div id="player-status">
+        <div class="hp-row"><span class="hp-label">Прочность</span><span id="hud-hp-text">250 / 250</span></div>
+        <div class="bar"><div id="hud-hp" class="bar-fill"></div></div>
+        <div class="speed-row"><span id="hud-speed">0</span> км/ч</div>
+      </div>
+      <div id="gun-panel">
+        <div id="shell-list"></div>
+        <div class="reload-wrap">
+          <div class="bar"><div id="hud-reload" class="bar-fill reload"></div></div>
+          <div id="reload-text">Готов</div>
+        </div>
+      </div>
+      <div id="minimap-wrap"><canvas id="minimap" width="180" height="180"></canvas></div>
+    </div>
+
+    <button id="btn-battle-menu" class="mini-btn">Меню</button>
+
+    <div id="touch-controls" class="hidden">
+      <div id="battle-joystick"><div id="battle-joystick-knob"></div></div>
+      <button id="battle-fire">🔥</button>
     </div>
   </div>
-  <div id="crosshair"></div>
-  <div id="damage-flash"></div>
-  <div id="wave-banner" class="hidden">ВОЛНА <span id="wave-num">1</span></div>
-  <div id="minimap-wrap"><canvas id="minimap" width="160" height="160"></canvas><div class="hud-label" style="text-align:center">Карта</div></div>
 </div>
 
-<!-- Touch controls -->
-<div id="touch-controls" class="hidden">
-  <div id="joystick"><div id="joystick-knob"></div></div>
-  <button id="btn-fire">🔥</button>
+<!-- ================= РЕЗУЛЬТАТЫ ================= -->
+<div id="screen-results" class="screen overlay hidden">
+  <div class="panel results-panel">
+    <h2 id="res-title">Победа!</h2>
+    <div id="res-stats"></div>
+    <div id="res-rewards"></div>
+    <div class="results-buttons">
+      <button class="big-btn" id="btn-to-garage">В ангар</button>
+      <button class="big-btn secondary" id="btn-again">Ещё бой</button>
+    </div>
+  </div>
 </div>
 
-<!-- Start menu -->
-<div id="menu" class="overlay">
+<!-- ================= ПАУЗА / МЕНЮ БОЯ ================= -->
+<div id="screen-pause" class="screen overlay hidden">
   <div class="panel">
-    <h1>🛡️ CITY TANKS</h1>
-    <p class="subtitle">3D танковые бои в ночном городе</p>
-    <div class="controls-grid">
-      <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> — движение</div>
-      <div>🖱 Мышь — башня</div>
-      <div><kbd>ЛКМ</kbd> — огонь</div>
-      <div><kbd>Shift</kbd> — форсаж</div>
-      <div><kbd>Esc</kbd> / <kbd>P</kbd> — пауза</div>
-      <div>📱 На телефоне — джойстик + кнопка</div>
-    </div>
-    <button id="btn-start" class="big-btn">▶ В БОЙ</button>
-    <div id="leaderboard">
-      <h3>🏆 Таблица рекордов</h3>
-      <ol id="leaderboard-list"><li>Пока пусто — стань первым!</li></ol>
-    </div>
-    <p class="hint">HTML + JS + CSS + Three.js · GitHub Pages / Vercel / Firebase</p>
+    <h2>Пауза</h2>
+    <p class="muted">Бой остановлен</p>
+    <button class="big-btn" id="btn-resume">Продолжить</button>
+    <button class="big-btn secondary" id="btn-leave">Покинуть бой</button>
   </div>
 </div>
 
-<!-- Pause -->
-<div id="pause-menu" class="overlay hidden">
+<!-- ================= НАСТРОЙКИ ================= -->
+<div id="screen-settings" class="screen overlay hidden">
   <div class="panel">
-    <h2>⏸ Пауза</h2>
-    <button id="btn-resume" class="big-btn">▶ Продолжить</button>
-    <button id="btn-restart" class="big-btn secondary">↻ Заново</button>
-    <button id="btn-quit" class="big-btn secondary">🏠 В меню</button>
+    <h2>Настройки</h2>
+    <label class="setting-row">
+      <span>Звук</span>
+      <input type="checkbox" id="set-sound" checked>
+    </label>
+    <label class="setting-row">
+      <span>Имя игрока</span>
+      <input type="text" id="set-name" maxlength="16">
+    </label>
+    <div class="settings-row">
+      <button class="big-btn secondary" id="btn-reset-profile">Сбросить прогресс</button>
+      <button class="big-btn" id="btn-close-settings">Закрыть</button>
+    </div>
+    <p class="muted small">Управление: W/S — ход, A/D — поворот корпуса, мышь — башня, ЛКМ — огонь, ПКМ — снайперский прицел, 1/2/3 — снаряд, Shift — форсаж.</p>
   </div>
 </div>
 
-<!-- Game over -->
-<div id="gameover" class="overlay hidden">
-  <div class="panel">
-    <h2>💥 Танк уничтожен</h2>
-    <p id="final-stats"></p>
-    <input id="player-name" maxlength="16" placeholder="Твоё имя для рекорда" value="Командир">
-    <button id="btn-save-score" class="big-btn">💾 Сохранить рекорд</button>
-    <button id="btn-again" class="big-btn">↻ Ещё раз</button>
-    <button id="btn-menu" class="big-btn secondary">🏠 В меню</button>
-  </div>
-</div>
+<div id="toast"></div>
+<div id="boot">Загрузка города…</div>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -3,15 +3,18 @@ import * as THREE from '../vendor/three.module.js';
 // Ночной город: дороги, здания с окнами, фонари, деревья, небо.
 export const WORLD = { size: 240, half: 120 };
 
-export function buildCity(scene) {
+export function buildCity(scene, opts = {}) {
   const colliders = [];
   const group = new THREE.Group();
   scene.add(group);
 
   // --- Освещение ---
-  scene.fog = new THREE.Fog(0x0a0e1a, 70, 230);
-  scene.add(new THREE.HemisphereLight(0x8899ff, 0x1a1410, 0.6));
-  const moon = new THREE.DirectionalLight(0xaac4ff, 1.0);
+  const fogNear = opts.fogNear ?? 70, fogFar = opts.fogFar ?? 230;
+  const brightness = opts.brightness ?? 1;
+  const ambient = opts.ambient ?? 0x8899ff;
+  scene.fog = new THREE.Fog(opts.fogColor ?? 0x0a0e1a, fogNear, fogFar);
+  scene.add(new THREE.HemisphereLight(ambient, 0x1a1410, 0.6 * brightness));
+  const moon = new THREE.DirectionalLight(0xaac4ff, 1.0 * brightness);
   moon.position.set(60, 90, -40);
   moon.castShadow = true;
   moon.shadow.mapSize.set(2048, 2048);
@@ -100,7 +103,9 @@ export function buildCity(scene) {
           const cx = bx + (rand() - 0.5) * 2, cz = bz + (rand() - 0.5) * 2;
           const color = palette[Math.floor(rand() * palette.length)];
           const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color, roughness: 0.85 }));
-          b.position.set(cx, h / 2, cz); b.castShadow = true; b.receiveShadow = true; group.add(b);
+          b.position.set(cx, h / 2, cz); b.castShadow = true; b.receiveShadow = true;
+          b.userData.building = true;   // по этим мешам бой считает попадания и линию видимости
+          group.add(b);
           const roof = new THREE.Mesh(new THREE.BoxGeometry(w * 0.6, 1.2, d * 0.6), new THREE.MeshStandardMaterial({ color: 0x14181f }));
           roof.position.set(cx, h + 0.6, cz); group.add(roof);
           // Окна (собираем в инстансы)

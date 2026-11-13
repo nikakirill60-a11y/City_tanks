@@ -2,7 +2,7 @@
 // Если конфиг не задан, автоматически работает локальный режим (localStorage).
 // Как подключить: создай проект на https://console.firebase.google.com,
 // включи Firestore, вставь свой конфиг в window.FIREBASE_CONFIG ниже
-// (или в отдельном firebase-config.js, подключённом ДО main.js).
+// (или в отдельном firebase-config.js, подключённом ДО app.js).
 
 const FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;
 const LS_KEY = 'city_tanks_scores';
