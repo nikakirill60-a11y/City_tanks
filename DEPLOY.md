@@ -21,9 +21,13 @@ Workflow `.github/workflows/deploy.yml` уже в репозитории и пы
 
 ## 2. Vercel
 
-Проект `city-tanks` уже создан и привязан к репозиторию `nikakirill60-a11y/City_tanks`.
-Первое развёртывание нужно запустить из панели Vercel (через API нужен объект
-`projectSettings`, которого нет у коннектора):
+Проект `city-tanks` создан и привязан к репозиторию — **деплой идёт автоматически**
+при пуше в `main` (production) и в PR (preview):
+
+- production: https://city-tanks-git-main-super-abobus-projects.vercel.app
+- редактор моделей: тот же домен + `/models.html`
+
+Если нужно пересоздать проект с нуля:
 
 - **Вариант А (панель):** [vercel.com/new](https://vercel.com/new) → импорт `City_tanks` →
   Framework Preset **Other**, Build Command пусто, Output Directory пусто → **Deploy**.
@@ -69,6 +73,10 @@ firebase deploy --only hosting,firestore:rules
 ## Проверка перед публикацией
 
 ```bash
-node tests/game.test.mjs          # 28 автотестов логики
-npx serve .                       # локальный сервер (или python3 -m http.server)
+node tests/armor.test.mjs
+node tests/data.test.mjs
+node tests/battle.test.mjs
+node tests/sim.test.mjs
+node tests/structure.test.mjs
+npx serve .        # или python3 -m http.server
 ```
