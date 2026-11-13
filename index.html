@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>City Tanks — 3D танки в городе</title>
+<meta name="description" content="City Tanks — 3D танковая аркада в браузере. HTML + JS + CSS + Three.js. Деплой: GitHub Pages, Vercel, Firebase Hosting.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game-canvas"></canvas>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="hud-top">
+    <div class="hud-box" id="hud-health-wrap">
+      <div class="hud-label">❤️ Броня</div>
+      <div class="bar"><div id="hud-health" class="bar-fill"></div></div>
+      <div class="hud-box" style="margin-top:6px">
+        <div class="hud-label">🔥 Перезарядка</div>
+        <div class="bar"><div id="hud-reload" class="bar-fill reload"></div></div>
+      </div>
+    </div>
+    <div class="hud-box hud-center">
+      <div id="hud-score">СЧЁТ 0</div>
+      <div id="hud-wave">ВОЛНА 1</div>
+      <div id="hud-enemies">Врагов: 0</div>
+    </div>
+    <div class="hud-box hud-right">
+      <div id="hud-kills">💀 Убийств: 0</div>
+      <div id="hud-time">⏱ 0:00</div>
+      <button id="btn-pause" class="mini-btn">⏸ Пауза</button>
+      <button id="btn-sound" class="mini-btn">🔊</button>
+    </div>
+  </div>
+  <div id="crosshair"></div>
+  <div id="damage-flash"></div>
+  <div id="wave-banner" class="hidden">ВОЛНА <span id="wave-num">1</span></div>
+  <div id="minimap-wrap"><canvas id="minimap" width="160" height="160"></canvas><div class="hud-label" style="text-align:center">Карта</div></div>
+</div>
+
+<!-- Touch controls -->
+<div id="touch-controls" class="hidden">
+  <div id="joystick"><div id="joystick-knob"></div></div>
+  <button id="btn-fire">🔥</button>
+</div>
+
+<!-- Start menu -->
+<div id="menu" class="overlay">
+  <div class="panel">
+    <h1>🛡️ CITY TANKS</h1>
+    <p class="subtitle">3D танковые бои в ночном городе</p>
+    <div class="controls-grid">
+      <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> — движение</div>
+      <div>🖱 Мышь — башня</div>
+      <div><kbd>ЛКМ</kbd> — огонь</div>
+      <div><kbd>Shift</kbd> — форсаж</div>
+      <div><kbd>Esc</kbd> / <kbd>P</kbd> — пауза</div>
+      <div>📱 На телефоне — джойстик + кнопка</div>
+    </div>
+    <button id="btn-start" class="big-btn">▶ В БОЙ</button>
+    <div id="leaderboard">
+      <h3>🏆 Таблица рекордов</h3>
+      <ol id="leaderboard-list"><li>Пока пусто — стань первым!</li></ol>
+    </div>
+    <p class="hint">HTML + JS + CSS + Three.js · GitHub Pages / Vercel / Firebase</p>
+  </div>
+</div>
+
+<!-- Pause -->
+<div id="pause-menu" class="overlay hidden">
+  <div class="panel">
+    <h2>⏸ Пауза</h2>
+    <button id="btn-resume" class="big-btn">▶ Продолжить</button>
+    <button id="btn-restart" class="big-btn secondary">↻ Заново</button>
+    <button id="btn-quit" class="big-btn secondary">🏠 В меню</button>
+  </div>
+</div>
+
+<!-- Game over -->
+<div id="gameover" class="overlay hidden">
+  <div class="panel">
+    <h2>💥 Танк уничтожен</h2>
+    <p id="final-stats"></p>
+    <input id="player-name" maxlength="16" placeholder="Твоё имя для рекорда" value="Командир">
+    <button id="btn-save-score" class="big-btn">💾 Сохранить рекорд</button>
+    <button id="btn-again" class="big-btn">↻ Ещё раз</button>
+    <button id="btn-menu" class="big-btn secondary">🏠 В меню</button>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
