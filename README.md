@@ -14,11 +14,14 @@
 
 На телефоне — виртуальный джойстик + кнопка огня.
 
-## 🚀 Деплой (3 варианта)
+## 🚀 Деплой
+
+Подробная инструкция по всем трём площадкам — в **[DEPLOY.md](DEPLOY.md)**. Кратко:
 
 ### 1. GitHub Pages
-1. Запушь в `main` — workflow `.github/workflows/deploy.yml` сам опубликует сайт.
-2. В настройках репозитория: **Settings → Pages → Source: GitHub Actions**.
+Workflow `.github/workflows/deploy.yml` публикует сайт при каждом пуше в `main`
+и сам пытается включить Pages. Если прав токена не хватило — один раз:
+**Settings → Pages → Source: GitHub Actions**, затем Re-run workflow.
 
 ### 2. Vercel
 1. Зайди на [vercel.com/new](https://vercel.com/new) → импортируй репозиторий.
@@ -43,6 +46,14 @@ firebase deploy
 3. **Project settings → Your apps → Web app (</>)** → скопируй `firebaseConfig`.
 4. Вставь его в `js/firebase.js` (замени `window.FIREBASE_CONFIG`) или создай `js/firebase-config.js` с `window.FIREBASE_CONFIG = {...}` и подключи его в `index.html` **до** `main.js`.
 
+## 🧪 Тесты
+
+```bash
+node tests/game.test.mjs        # 28 проверок: физика, коллизии, ствол, урон, снаряды, перф
+node tests/structure.test.mjs   # ссылки, импорты, id, конфиги деплоя
+```
+Оба теста гоняются в CI (`.github/workflows/tests.yml`).
+
 ## 📁 Структура
 
 ```
@@ -54,6 +65,9 @@ js/city.js            — ночной город: здания, дороги, �
 js/effects.js         — снаряды, взрывы, частицы
 js/audio.js           — звуки на WebAudio (без файлов)
 js/firebase.js        — рекорды: Firestore или localStorage
+firebase-config.example.js — шаблон конфига Firebase
+tests/                — автотесты (Node, без браузера)
+vendor/               — Three.js r160 локально (CDN не нужен)
 vercel.json / firebase.json / .github/workflows/deploy.yml — деплой
 ```
 
